@@ -4,7 +4,7 @@
 mongos_chunk_size: 1
 
 # The port in which mongos server should listen on 
-mongos_port: 8888
+mongos_port: 2710
 
 # The port for mongo config server
 mongoc_port: 7777
@@ -22,4 +22,4 @@ mongodb_datadir_prefix: /data/
 iface: '{{ ansible_default_ipv4.interface }}'
 
 # The password for admin user
-mongo_admin_pass: 123456
+mongo_admin_pass: VjMD?9R4WuJNwyp_

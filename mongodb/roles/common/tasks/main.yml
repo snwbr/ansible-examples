@@ -5,13 +5,15 @@
   template: src=hosts.j2 dest=/etc/hosts
 
 - name: Create the repository for 10Gen
-  copy: src=10gen.repo.j2 dest=/etc/yum.repos.d/10gen.repo
+  copy: src=mongodb-org-4.0.repo.j2 dest=/etc/yum.repos.d/mongodb-org-4.0.repo
 
-- name: Create the EPEL Repository.
-  copy: src=epel.repo.j2 dest=/etc/yum.repos.d/epel.repo
+- name: Create the EPEL Repository
+  yum: name={{ item }} state=installed
+  with_items:
+   - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
-- name: Create the GPG key for EPEL
-  copy: src=RPM-GPG-KEY-EPEL-6 dest=/etc/pki/rpm-gpg
+- name: Enable extra repositories
+  shell: subscription-manager repos --enable "rhel-*-optional-rpms" --enable "rhel-*-extras-rpms"
 
 - name: Create the mongod user
   user: name=mongod comment="MongoD"
@@ -23,14 +25,15 @@
   yum: name={{ item }} state=installed
   with_items:
    - libselinux-python
-   - mongo-10gen
-   - mongo-10gen-server
+   - mongodb-org
    - bc
    - python-pip
 
 - name: Install the latest pymongo package
   pip: name=pymongo state=latest use_mirrors=no
 
-- name: Create the iptables file
-  template: src=iptables.j2 dest=/etc/sysconfig/iptables
-  notify: restart iptables
+- name: Set SELinux rules to allow MongoDB port 2710
+  shell: semanage port -a -t mongod_port_t -p tcp 2710
+
+- name: Set SELinux rules to allow MongoDB port 7777
+  shell: semanage port -a -t mongod_port_t -p tcp 7777
